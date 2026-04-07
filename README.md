@@ -2,7 +2,7 @@
 
 A web-based financial dashboard that tracks **mNAV (Modified Net Asset Value)** for MicroStrategy (MSTR / Strategy Inc) — a key DAT.co (Digital Asset Treasury company) indicator.
 
-**Live Demo:** [mstr-mnav-monitor.up.railway.app](https://mstr-mnav-monitor.up.railway.app)
+**Live Demo:** [mstr-mnav-monitor-production.up.railway.app](https://mstr-mnav-monitor-production.up.railway.app)
 
 ---
 
