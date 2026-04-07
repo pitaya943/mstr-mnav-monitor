@@ -3,9 +3,10 @@ interface StatCardProps {
   value: string | number;
   sub?: string;
   highlight?: "green" | "yellow" | "red" | "blue" | "none";
+  icon?: React.ReactNode;
 }
 
-export function StatCard({ label, value, sub, highlight = "none" }: StatCardProps) {
+export function StatCard({ label, value, sub, highlight = "none", icon }: StatCardProps) {
   const colours: Record<string, string> = {
     green: "text-emerald-400",
     yellow: "text-amber-400",
@@ -19,9 +20,12 @@ export function StatCard({ label, value, sub, highlight = "none" }: StatCardProp
       <span className="text-xs font-semibold uppercase tracking-widest text-zinc-400">
         {label}
       </span>
-      <span className={`text-2xl font-bold tabular-nums ${colours[highlight]}`}>
-        {value}
-      </span>
+      <div className="flex items-center gap-2">
+        {icon && <span className="flex-shrink-0">{icon}</span>}
+        <span className={`text-2xl font-bold tabular-nums ${colours[highlight]}`}>
+          {value}
+        </span>
+      </div>
       {sub && <span className="text-xs text-zinc-500">{sub}</span>}
     </div>
   );
