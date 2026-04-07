@@ -262,7 +262,7 @@ export function Dashboard() {
         </div>
 
         {/* AI Insight */}
-        <InsightPanel data={data} />
+        <InsightPanel data={data} quote={quote} />
 
         {/* Footer */}
         <footer className="text-center text-xs text-zinc-600 pb-4">

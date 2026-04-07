@@ -3,9 +3,11 @@
 import { useState } from "react";
 import type { MNavDataPoint } from "@/lib/mnav";
 import type { BilingualInsight } from "@/lib/anthropic";
+import type { LiveQuote } from "@/app/api/quote/route";
 
 interface InsightPanelProps {
   data: MNavDataPoint[];
+  quote: LiveQuote | null;
 }
 
 function InsightText({ text }: { text: string }) {
@@ -20,7 +22,7 @@ function InsightText({ text }: { text: string }) {
   );
 }
 
-export function InsightPanel({ data }: InsightPanelProps) {
+export function InsightPanel({ data, quote }: InsightPanelProps) {
   const [insight, setInsight] = useState<BilingualInsight | null>(null);
   const [tab, setTab] = useState<"en" | "zh">("en");
   const [loading, setLoading] = useState(false);
@@ -31,10 +33,28 @@ export function InsightPanel({ data }: InsightPanelProps) {
     setError("");
     setInsight(null);
     try {
+      // Append live quote as today's data point so the AI sees current prices
+      const today = new Date().toISOString().slice(0, 10);
+      const livePoint: MNavDataPoint | null = quote
+        ? {
+            date: today,
+            mNAV: quote.mNAV,
+            btcPrice: quote.btcPrice,
+            mstrPrice: quote.mstrPrice,
+            btcHoldings: quote.btcHoldings,
+            sharesOutstanding: quote.sharesOutstanding,
+            marketCap: quote.marketCap,
+            btcNAV: quote.btcNAV,
+            premium: quote.premium,
+          }
+        : null;
+
+      const payload = livePoint ? [...data, livePoint] : data;
+
       const res = await fetch("/api/insight", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ data }),
+        body: JSON.stringify({ data: payload }),
       });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error ?? "Unknown error");
