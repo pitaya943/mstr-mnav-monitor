@@ -2,7 +2,7 @@ interface StatCardProps {
   label: string;
   value: string | number;
   sub?: string;
-  highlight?: "green" | "yellow" | "red" | "blue" | "none";
+  highlight?: "green" | "yellow" | "red" | "blue" | "orange" | "none";
   icon?: React.ReactNode;
 }
 
@@ -12,6 +12,7 @@ export function StatCard({ label, value, sub, highlight = "none", icon }: StatCa
     yellow: "text-amber-400",
     red: "text-rose-400",
     blue: "text-sky-400",
+    orange: "text-orange-400",
     none: "text-white",
   };
 
