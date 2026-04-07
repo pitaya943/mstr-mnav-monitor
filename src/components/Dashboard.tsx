@@ -126,7 +126,7 @@ export function Dashboard() {
 
       <main className="max-w-7xl mx-auto px-6 py-8 space-y-8">
         {/* Live stat cards */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
           <StatCard
             label="mNAV"
             value={quote ? `${quote.mNAV.toFixed(3)}×` : "—"}
@@ -157,9 +157,14 @@ export function Dashboard() {
             highlight="blue"
           />
           <StatCard
+            label="MSTR NAV"
+            value={quote ? `$${quote.marketCap.toFixed(1)}B` : "—"}
+            sub="Market Cap (USD)"
+          />
+          <StatCard
             label="BTC NAV"
             value={quote ? `$${quote.btcNAV.toFixed(1)}B` : "—"}
-            sub="Billions USD"
+            sub="BTC Holdings Value"
           />
         </div>
 
