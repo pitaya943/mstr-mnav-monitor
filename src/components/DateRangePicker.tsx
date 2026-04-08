@@ -8,19 +8,18 @@ interface DateRangePickerProps {
 }
 
 const PRESETS = [
-  { label: "3M", months: 3 },
-  { label: "6M", months: 6 },
-  { label: "1Y", months: 12 },
-  { label: "2Y", months: 24 },
-  { label: "All", months: 56 }, // since Aug 2020
+  { label: "1M", days: 30 },
+  { label: "3M", days: 90 },
+  { label: "6M", days: 180 },
+  { label: "1Y", days: 365 },
+  { label: "2Y", days: 730 },
+  { label: "All", days: 365 * 6 }, // since Aug 2020
 ];
 
 export function DateRangePicker({ from, to, onChange, loading }: DateRangePickerProps) {
-  function applyPreset(months: number) {
+  function applyPreset(days: number) {
     const end = new Date();
-    const start = new Date();
-    start.setMonth(start.getMonth() - months);
-    // Clamp to earliest possible date
+    const start = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
     const earliest = new Date("2020-08-11");
     if (start < earliest) start.setTime(earliest.getTime());
     onChange(start.toISOString().slice(0, 10), end.toISOString().slice(0, 10));
@@ -31,7 +30,7 @@ export function DateRangePicker({ from, to, onChange, loading }: DateRangePicker
       {PRESETS.map((p) => (
         <button
           key={p.label}
-          onClick={() => applyPreset(p.months)}
+          onClick={() => applyPreset(p.days)}
           disabled={loading}
           className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-sm font-medium text-zinc-300 transition hover:bg-white/10 disabled:opacity-40"
         >
