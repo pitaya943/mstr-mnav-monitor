@@ -70,10 +70,7 @@ export function MNavChart({ data }: MNavChartProps) {
     );
   }
 
-  const maxPoints = 500;
-  const step = Math.max(1, Math.floor(data.length / maxPoints));
   const chartData = data
-    .filter((_, i) => i % step === 0 || i === data.length - 1)
     .map((d) => ({
       date: formatDate(d.date),
       rawDate: d.date,
