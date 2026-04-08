@@ -30,19 +30,25 @@ interface TooltipPayload {
   name: string;
   value: number;
   color: string;
+  payload: { rawDate: string };
 }
 
 interface CustomTooltipProps {
   active?: boolean;
   payload?: TooltipPayload[];
-  label?: string;
 }
 
-function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
+function CustomTooltip({ active, payload }: CustomTooltipProps) {
   if (!active || !payload || payload.length === 0) return null;
+  const rawDate = payload[0]?.payload?.rawDate ?? "";
+  const displayDate = rawDate
+    ? new Date(rawDate + "T00:00:00").toLocaleDateString("en-US", {
+        year: "numeric", month: "short", day: "numeric",
+      })
+    : "";
   return (
     <div className="rounded-xl border border-white/10 bg-zinc-900/95 p-3 text-xs shadow-xl backdrop-blur">
-      <p className="font-semibold text-zinc-300 mb-2">{label}</p>
+      <p className="font-semibold text-zinc-300 mb-2">{displayDate}</p>
       {payload.map((p) => (
         <div key={p.name} className="flex justify-between gap-4">
           <span style={{ color: p.color }}>{p.name}</span>
@@ -51,8 +57,6 @@ function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
               ? p.value.toFixed(3) + "×"
               : p.name === "BTC Price"
               ? formatK(p.value)
-              : p.name === "MSTR Price"
-              ? `$${p.value.toFixed(2)}`
               : p.value}
           </span>
         </div>
