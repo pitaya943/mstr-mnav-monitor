@@ -88,11 +88,12 @@ export function MNavChart({ data }: MNavChartProps) {
       <ComposedChart data={chartData} margin={{ top: 10, right: 24, left: 0, bottom: 0 }}>
         <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.07)" />
         <XAxis
-          dataKey="date"
+          dataKey="rawDate"
           tick={{ fill: "#71717a", fontSize: 11 }}
           tickLine={false}
           axisLine={{ stroke: "rgba(255,255,255,0.1)" }}
           interval="preserveStartEnd"
+          tickFormatter={formatDate}
         />
         {/* Left axis: mNAV & NAV Premium */}
         <YAxis
