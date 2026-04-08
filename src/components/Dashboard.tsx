@@ -130,14 +130,14 @@ export function Dashboard() {
           <StatCard
             label="mNAV"
             value={quote ? `${quote.mNAV.toFixed(3)}×` : "—"}
-            sub="Market Cap / BTC NAV"
+            sub="Enterprise Value / BTC NAV"
             highlight={quote ? mNavColour(quote.mNAV) : "none"}
           />
           <StatCard
-            label="Premium"
-            value={quote ? `${quote.premium > 0 ? "+" : ""}${quote.premium.toFixed(1)}%` : "—"}
-            sub="Over BTC NAV"
-            highlight={quote ? (quote.premium > 0 ? "yellow" : "green") : "none"}
+            label="NAV Premium"
+            value={quote ? `${quote.navPremium.toFixed(3)}×` : "—"}
+            sub="Market Cap / BTC NAV"
+            highlight={quote ? (quote.navPremium > 1 ? "yellow" : "green") : "none"}
           />
           <StatCard
             label="BTC Price"
@@ -194,9 +194,9 @@ export function Dashboard() {
         <div className="rounded-xl border border-white/10 bg-white/5 backdrop-blur px-5 py-6">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h2 className="text-base font-semibold text-white">mNAV vs BTC Price</h2>
+              <h2 className="text-base font-semibold text-white">mNAV · NAV Premium · BTC Price</h2>
               <p className="text-xs text-zinc-500 mt-0.5">
-                mNAV = MSTR Market Cap ÷ (BTC Holdings × BTC Price) · Reference line at 1.0 = fair value
+                mNAV = Enterprise Value ÷ BTC NAV · NAV Premium = Market Cap ÷ BTC NAV · Reference line at 1.0 = fair value
               </p>
             </div>
             <div className="flex items-center gap-3">
@@ -237,16 +237,17 @@ export function Dashboard() {
           <div>
             <h2 className="text-base font-semibold text-white mb-2">What is mNAV?</h2>
             <p className="text-sm text-zinc-400 leading-relaxed">
-              <strong className="text-zinc-200">mNAV (Modified Net Asset Value)</strong> measures how much
-              premium the equity market assigns to a Bitcoin treasury company&apos;s holdings. It is calculated as:
+              <strong className="text-zinc-200">mNAV (Modified Net Asset Value)</strong> measures the total enterprise claim relative to Bitcoin holdings. <strong className="text-zinc-200">NAV Premium</strong> measures the equity-only ratio.
             </p>
-            <div className="mt-3 rounded-lg bg-black/40 border border-white/10 px-4 py-3 font-mono text-sm text-amber-300">
-              mNAV = Market Cap / (BTC Holdings × BTC Price)
+            <div className="mt-3 rounded-lg bg-black/40 border border-white/10 px-4 py-3 font-mono text-sm space-y-1">
+              <div className="text-amber-300">mNAV = Enterprise Value / BTC NAV</div>
+              <div className="text-violet-400">NAV Premium = Market Cap / BTC NAV</div>
+              <div className="text-zinc-500 text-xs mt-1">Enterprise Value = Market Cap + Total Debt + Preferred Stock</div>
             </div>
             <ul className="mt-3 text-sm text-zinc-400 space-y-1">
-              <li><span className="text-white font-medium">mNAV = 1.0</span> — trades exactly at BTC value</li>
-              <li><span className="text-amber-400 font-medium">mNAV &gt; 1.0</span> — market premium (leveraged BTC exposure, brand, access)</li>
-              <li><span className="text-emerald-400 font-medium">mNAV &lt; 1.0</span> — rare discount to BTC NAV</li>
+              <li><span className="text-white font-medium">= 1.0</span> — fair value (equity trades at BTC NAV)</li>
+              <li><span className="text-amber-400 font-medium">&gt; 1.0</span> — premium (leveraged BTC exposure, brand, capital access)</li>
+              <li><span className="text-emerald-400 font-medium">&lt; 1.0</span> — discount to BTC NAV</li>
             </ul>
           </div>
           <div>

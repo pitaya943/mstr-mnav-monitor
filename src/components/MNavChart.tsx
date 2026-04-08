@@ -47,7 +47,7 @@ function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
         <div key={p.name} className="flex justify-between gap-4">
           <span style={{ color: p.color }}>{p.name}</span>
           <span className="tabular-nums text-white font-medium">
-            {p.name === "mNAV"
+            {p.name === "mNAV" || p.name === "NAV Premium"
               ? p.value.toFixed(3) + "×"
               : p.name === "BTC Price"
               ? formatK(p.value)
@@ -70,7 +70,6 @@ export function MNavChart({ data }: MNavChartProps) {
     );
   }
 
-  // Subsample for readability if too many points
   const maxPoints = 500;
   const step = Math.max(1, Math.floor(data.length / maxPoints));
   const chartData = data
@@ -79,8 +78,8 @@ export function MNavChart({ data }: MNavChartProps) {
       date: formatDate(d.date),
       rawDate: d.date,
       mNAV: d.mNAV,
+      "NAV Premium": d.navPremium,
       "BTC Price": d.btcPrice,
-      "MSTR Price": d.mstrPrice,
     }));
 
   return (
@@ -94,7 +93,7 @@ export function MNavChart({ data }: MNavChartProps) {
           axisLine={{ stroke: "rgba(255,255,255,0.1)" }}
           interval="preserveStartEnd"
         />
-        {/* Left axis: mNAV */}
+        {/* Left axis: mNAV & NAV Premium */}
         <YAxis
           yAxisId="mnav"
           orientation="left"
@@ -117,10 +116,8 @@ export function MNavChart({ data }: MNavChartProps) {
           width={56}
         />
         <Tooltip content={<CustomTooltip />} />
-        <Legend
-          wrapperStyle={{ color: "#a1a1aa", fontSize: 12, paddingTop: 12 }}
-        />
-        {/* Fair value line at mNAV = 1 */}
+        <Legend wrapperStyle={{ color: "#a1a1aa", fontSize: 12, paddingTop: 12 }} />
+        {/* Fair value reference line */}
         <ReferenceLine
           yAxisId="mnav"
           y={1}
@@ -128,23 +125,39 @@ export function MNavChart({ data }: MNavChartProps) {
           strokeDasharray="6 3"
           label={{ value: "Fair Value", fill: "#52525b", fontSize: 10, position: "insideTopLeft" }}
         />
+        {/* mNAV = Enterprise Value / BTC NAV */}
         <Line
           yAxisId="mnav"
           type="monotone"
           dataKey="mNAV"
+          name="mNAV"
           stroke="#f59e0b"
           strokeWidth={2}
           dot={false}
           activeDot={{ r: 4, fill: "#f59e0b" }}
         />
+        {/* NAV Premium = Market Cap / BTC NAV */}
+        <Line
+          yAxisId="mnav"
+          type="monotone"
+          dataKey="NAV Premium"
+          name="NAV Premium"
+          stroke="#a78bfa"
+          strokeWidth={1.5}
+          dot={false}
+          activeDot={{ r: 4, fill: "#a78bfa" }}
+          strokeDasharray="5 3"
+        />
+        {/* BTC Price */}
         <Line
           yAxisId="btc"
           type="monotone"
           dataKey="BTC Price"
-          stroke="#60a5fa"
+          name="BTC Price"
+          stroke="#fb923c"
           strokeWidth={1.5}
           dot={false}
-          activeDot={{ r: 4, fill: "#60a5fa" }}
+          activeDot={{ r: 4, fill: "#fb923c" }}
           strokeDasharray="4 2"
         />
       </ComposedChart>

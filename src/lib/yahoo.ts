@@ -62,18 +62,21 @@ export interface LivePrices {
   btcPrice: number;
   mstrPrice: number;
   mstrSharesOutstanding: number;
+  totalDebt: number; // latest total debt from Yahoo Finance financialData (USD)
 }
 
-/** Fetch current BTC-USD and MSTR prices in a single parallel call. */
+/** Fetch current BTC-USD and MSTR prices + debt in parallel. */
 export async function fetchLivePrices(): Promise<LivePrices> {
   const yf = getYf();
-  const [btcQuote, mstrQuote] = await Promise.all([
+  const [btcQuote, mstrQuote, financials] = await Promise.all([
     yf.quote("BTC-USD"),
     yf.quote("MSTR"),
+    yf.quoteSummary("MSTR", { modules: ["financialData"] }),
   ]);
   return {
     btcPrice: btcQuote.regularMarketPrice ?? 0,
     mstrPrice: mstrQuote.regularMarketPrice ?? 0,
     mstrSharesOutstanding: mstrQuote.sharesOutstanding ?? 0,
+    totalDebt: (financials.financialData?.totalDebt as number) ?? 8_236_290_000,
   };
 }

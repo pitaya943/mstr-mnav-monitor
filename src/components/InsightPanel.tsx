@@ -39,11 +39,15 @@ export function InsightPanel({ data, quote }: InsightPanelProps) {
         ? {
             date: today,
             mNAV: quote.mNAV,
+            navPremium: quote.navPremium,
             btcPrice: quote.btcPrice,
             mstrPrice: quote.mstrPrice,
             btcHoldings: quote.btcHoldings,
             sharesOutstanding: quote.sharesOutstanding,
             marketCap: quote.marketCap,
+            enterpriseValue: quote.enterpriseValue,
+            totalDebt: quote.totalDebt,
+            preferredStock: quote.preferredStock,
             btcNAV: quote.btcNAV,
             premium: quote.premium,
           }

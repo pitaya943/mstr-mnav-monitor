@@ -31,11 +31,15 @@ export async function generateMNavInsight(
   const summary = {
     period: `${oldest.date} to ${latest.date}`,
     currentMNav: latest.mNAV,
-    currentPremium: latest.premium,
+    currentNavPremium: latest.navPremium,
+    currentPremiumPct: latest.premium,
     currentBtcPrice: latest.btcPrice,
     currentMstrPrice: latest.mstrPrice,
     btcHoldings: latest.btcHoldings,
     marketCapBillions: latest.marketCap,
+    enterpriseValueBillions: latest.enterpriseValue,
+    totalDebtBillions: latest.totalDebt,
+    preferredStockBillions: latest.preferredStock,
     btcNAVBillions: latest.btcNAV,
     maxMNav,
     minMNav,
@@ -51,7 +55,9 @@ export async function generateMNavInsight(
         role: "user",
         content: `You are a financial analyst specializing in Bitcoin treasury companies (DAT.co — Digital Asset Treasury companies). Analyze the following mNAV (Modified Net Asset Value) data for MicroStrategy (MSTR, now Strategy Inc).
 
-mNAV = Market Cap / (BTC Holdings × BTC Price). A value > 1 means the market prices MSTR at a premium to its Bitcoin holdings; < 1 means a discount.
+Two key indicators:
+- mNAV = Enterprise Value / BTC NAV, where Enterprise Value = Market Cap + Total Debt + Preferred Stock. Measures the total claim on the firm relative to its BTC treasury.
+- NAV Premium = Market Cap / BTC NAV. Equity-only ratio. Both > 1 mean premium; < 1 means discount.
 
 Data summary:
 ${JSON.stringify(summary, null, 2)}
