@@ -1,9 +1,7 @@
 import { NextRequest } from "next/server";
 import { computeMNavSeries } from "@/lib/mnav";
 
-// Cache historical data for 24 hours — past closing prices never change.
-// The `to` date is always clamped to yesterday so the cache key is stable.
-export const revalidate = 86400;
+export const dynamic = "force-dynamic";
 
 function defaultFrom() {
   const d = new Date();
