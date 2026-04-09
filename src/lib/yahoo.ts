@@ -28,16 +28,18 @@ export async function fetchStockHistory(
   toDate: string
 ): Promise<StockDayData[]> {
   const yf = getYf();
-  const rows = await yf.historical(symbol, {
-    period1: fromDate,
-    period2: toDate,
-    interval: "1d",
-  });
+  const rows = await yf.historical(
+    symbol,
+    { period1: fromDate, period2: toDate, interval: "1d" },
+    { validateResult: false }
+  );
 
-  return rows.map((r) => ({
-    date: new Date(r.date).toISOString().slice(0, 10),
-    close: r.close,
-  }));
+  return rows
+    .filter((r) => r.close != null && r.date != null)
+    .map((r) => ({
+      date: new Date(r.date).toISOString().slice(0, 10),
+      close: r.close,
+    }));
 }
 
 /** Convenience wrapper for BTC-USD daily close prices via Yahoo Finance. */
