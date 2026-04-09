@@ -28,18 +28,39 @@ export async function fetchStockHistory(
   toDate: string
 ): Promise<StockDayData[]> {
   const yf = getYf();
-  const rows = await yf.historical(
-    symbol,
-    { period1: fromDate, period2: toDate, interval: "1d" },
-    { validateResult: false }
-  );
 
-  return (rows as Array<{ date: Date; close: number | null | undefined }>)
-    .filter((r) => r.close != null && r.date != null)
-    .map((r) => ({
-      date: new Date(r.date).toISOString().slice(0, 10),
-      close: r.close as number,
-    }));
+  // Yahoo Finance returns SOME null values on long date ranges, causing
+  // yahoo-finance2 to throw. Split into 6-month chunks to avoid this.
+  const CHUNK_MONTHS = 6;
+  const dateMap = new Map<string, number>();
+
+  let current = new Date(fromDate);
+  const end = new Date(toDate);
+
+  while (current <= end) {
+    const chunkEnd = new Date(current);
+    chunkEnd.setMonth(chunkEnd.getMonth() + CHUNK_MONTHS);
+    if (chunkEnd > end) chunkEnd.setTime(end.getTime());
+
+    const rows = await yf.historical(symbol, {
+      period1: current.toISOString().slice(0, 10),
+      period2: chunkEnd.toISOString().slice(0, 10),
+      interval: "1d",
+    });
+
+    for (const r of rows) {
+      if (r.close != null && r.date != null) {
+        dateMap.set(new Date(r.date).toISOString().slice(0, 10), r.close);
+      }
+    }
+
+    current = new Date(chunkEnd);
+    current.setDate(current.getDate() + 1);
+  }
+
+  return Array.from(dateMap.entries())
+    .map(([date, close]) => ({ date, close }))
+    .sort((a, b) => a.date.localeCompare(b.date));
 }
 
 /** Convenience wrapper for BTC-USD daily close prices via Yahoo Finance. */
