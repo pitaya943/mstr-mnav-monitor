@@ -42,15 +42,29 @@ export async function fetchStockHistory(
     chunkEnd.setMonth(chunkEnd.getMonth() + CHUNK_MONTHS);
     if (chunkEnd > end) chunkEnd.setTime(end.getTime());
 
-    const rows = await yf.historical(symbol, {
-      period1: current.toISOString().slice(0, 10),
-      period2: chunkEnd.toISOString().slice(0, 10),
-      interval: "1d",
-    });
+    const p1 = current.toISOString().slice(0, 10);
+    const p2 = chunkEnd.toISOString().slice(0, 10);
 
-    for (const r of rows) {
-      if (r.close != null && r.date != null) {
-        dateMap.set(new Date(r.date).toISOString().slice(0, 10), r.close);
+    try {
+      const rows = await yf.historical(symbol, { period1: p1, period2: p2, interval: "1d" });
+      for (const r of rows) {
+        if (r.close != null && r.date != null)
+          dateMap.set(new Date(r.date).toISOString().slice(0, 10), r.close);
+      }
+    } catch {
+      // Retry with validateResult:false to tolerate null entries in this chunk
+      try {
+        const rows = await yf.historical(
+          symbol,
+          { period1: p1, period2: p2, interval: "1d" },
+          { validateResult: false }
+        ) as Array<{ date: Date | null; close: number | null }>;
+        for (const r of rows) {
+          if (r.close != null && r.date != null)
+            dateMap.set(new Date(r.date).toISOString().slice(0, 10), r.close);
+        }
+      } catch {
+        // Skip this chunk if it still fails
       }
     }
 
