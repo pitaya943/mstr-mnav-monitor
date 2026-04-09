@@ -34,11 +34,11 @@ export async function fetchStockHistory(
     { validateResult: false }
   );
 
-  return rows
+  return (rows as Array<{ date: Date; close: number | null | undefined }>)
     .filter((r) => r.close != null && r.date != null)
     .map((r) => ({
       date: new Date(r.date).toISOString().slice(0, 10),
-      close: r.close,
+      close: r.close as number,
     }));
 }
 
