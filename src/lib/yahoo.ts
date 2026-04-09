@@ -29,52 +29,20 @@ export async function fetchStockHistory(
 ): Promise<StockDayData[]> {
   const yf = getYf();
 
-  // Yahoo Finance returns SOME null values on long date ranges, causing
-  // yahoo-finance2 to throw. Split into 6-month chunks to avoid this.
-  const CHUNK_MONTHS = 6;
-  const dateMap = new Map<string, number>();
+  // Use chart() instead of historical() — chart() doesn't throw on partial
+  // null values, which historical() does for long date ranges.
+  const result = await yf.chart(symbol, {
+    period1: fromDate,
+    period2: toDate,
+    interval: "1d",
+  });
 
-  let current = new Date(fromDate);
-  const end = new Date(toDate);
-
-  while (current <= end) {
-    const chunkEnd = new Date(current);
-    chunkEnd.setMonth(chunkEnd.getMonth() + CHUNK_MONTHS);
-    if (chunkEnd > end) chunkEnd.setTime(end.getTime());
-
-    const p1 = current.toISOString().slice(0, 10);
-    const p2 = chunkEnd.toISOString().slice(0, 10);
-
-    try {
-      const rows = await yf.historical(symbol, { period1: p1, period2: p2, interval: "1d" });
-      for (const r of rows) {
-        if (r.close != null && r.date != null)
-          dateMap.set(new Date(r.date).toISOString().slice(0, 10), r.close);
-      }
-    } catch {
-      // Retry with validateResult:false to tolerate null entries in this chunk
-      try {
-        const rows = await yf.historical(
-          symbol,
-          { period1: p1, period2: p2, interval: "1d" },
-          { validateResult: false }
-        ) as Array<{ date: Date | null; close: number | null }>;
-        for (const r of rows) {
-          if (r.close != null && r.date != null)
-            dateMap.set(new Date(r.date).toISOString().slice(0, 10), r.close);
-        }
-      } catch {
-        // Skip this chunk if it still fails
-      }
-    }
-
-    current = new Date(chunkEnd);
-    current.setDate(current.getDate() + 1);
-  }
-
-  return Array.from(dateMap.entries())
-    .map(([date, close]) => ({ date, close }))
-    .sort((a, b) => a.date.localeCompare(b.date));
+  return (result.quotes ?? [])
+    .filter((q) => q.close != null && q.date != null)
+    .map((q) => ({
+      date: new Date(q.date).toISOString().slice(0, 10),
+      close: q.close as number,
+    }));
 }
 
 /** Convenience wrapper for BTC-USD daily close prices via Yahoo Finance. */
