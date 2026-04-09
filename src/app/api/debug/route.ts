@@ -1,4 +1,5 @@
 import YahooFinance from "yahoo-finance2";
+import { computeMNavSeries } from "@/lib/mnav";
 
 export const dynamic = "force-dynamic";
 
@@ -15,20 +16,21 @@ export async function GET() {
 
   try {
     const yf = new YahooFinance({ suppressNotices: ["yahooSurvey", "ripHistorical"] });
-    const mstr = await yf.quote("MSTR");
-    results.mstrQuote = { ok: true, price: mstr.regularMarketPrice };
+    const hist = await yf.historical("MSTR", {
+      period1: "2026-03-01",
+      period2: "2026-04-08",
+      interval: "1d",
+    });
+    results.mstrHistory = { ok: true, rows: hist.length, sample: hist[0] };
   } catch (e) {
-    results.mstrQuote = { ok: false, error: String(e) };
+    results.mstrHistory = { ok: false, error: String(e) };
   }
 
   try {
-    const yf = new YahooFinance({ suppressNotices: ["yahooSurvey", "ripHistorical"] });
-    const end = new Date().toISOString().slice(0, 10);
-    const start = new Date(Date.now() - 7 * 86_400_000).toISOString().slice(0, 10);
-    const hist = await yf.historical("BTC-USD", { period1: start, period2: end, interval: "1d" });
-    results.btcHistory = { ok: true, rows: hist.length };
+    const data = await computeMNavSeries("2026-03-01", "2026-04-07");
+    results.mnavCompute = { ok: true, rows: data.length, last: data[data.length - 1] };
   } catch (e) {
-    results.btcHistory = { ok: false, error: String(e) };
+    results.mnavCompute = { ok: false, error: String(e), stack: (e as Error)?.stack };
   }
 
   return Response.json(results);
